@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<link href="RAO_ID-web-resources/css/Three.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+	
+	
+    <script type= "module">
+import * as THREE from 'https://unpkg.com/three@0.119.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.119.0/examples/jsm/loaders/GLTFLoader.js';
+
+	var scene, camera, renderer, cube, controls, board;
+		let textureLoader;
+ 
+function init() {
+ 
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+ 
+  renderer = new THREE.WebGLRenderer( {antialias: true} );
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+ 
+  const geometry = new THREE.BoxGeometry( 40, 1, 40, 40, 1, 40 );
+const material = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+const board = new THREE.Mesh( geometry, material );
+	textureLoader = new THREE.TextureLoader();
+	textureLoader.load( "grid.png", function ( texture ) {
+
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set( 40, 40 );
+				board.material.map = texture;
+				board.material.needsUpdate = true;
+
+			} );
+
+  scene.add(board);
+	
+	const loader = new GLTFLoader();
+	loader.load("./413_Half_Surface7.glb", function (gltf) {
+		gltf.scene.position.y +=0.5;
+		gltf.scene.position.z -=15;
+		scene.add(gltf.scene);
+		animate();
+	});
+ 
+  camera.position.y = 1;
+  camera.position.z = 3;
+	
+	const ambientLight = new THREE.AmbientLight( 0x707070 );
+			scene.add( ambientLight );
+	
+	const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( - 7, 10, 15 );
+				light.castShadow = true;
+				const d = 10;
+				light.shadow.camera.left = - d;
+				light.shadow.camera.right = d;
+				light.shadow.camera.top = d;
+				light.shadow.camera.bottom = - d;
+
+				light.shadow.camera.near = 2;
+				light.shadow.camera.far = 50;
+
+				light.shadow.mapSize.x = 1024;
+				light.shadow.mapSize.y = 1024;
+
+				light.shadow.bias = - 0.003;
+				scene.add( light );
+ 
+  controls = new OrbitControls(camera, renderer.domElement);
+ 
+  controls.target.set(4.5, 0, 4.5);
+ 
+  controls.enablePan = false;
+  controls.maxPolarAngle = Math.PI / 2;
+ 
+  controls.enableDamping = true;
+ 
+  window.requestAnimationFrame(animate);
+}
+ 
+function animate() {
+  controls.update();
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(animate);
+}
+ 
+function onWindowResize() {
+ 
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+ 
+  renderer.setSize( window.innerWidth, window.innerHeight );
+ 
+}
+ 
+ 
+window.addEventListener('resize', onWindowResize);
+ 
+window.onload = init;
+
+
+	
+    </script>
+	
+</body>
+</html>
